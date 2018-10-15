@@ -1,0 +1,37 @@
+# Mac
+buildspec.sh
+.DS_Store
+.idea/
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+Dockerfile
+run.py
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+wheelhouse/
+cover/
+*.manifest
+*.spec
+
+

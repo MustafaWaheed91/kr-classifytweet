@@ -10,7 +10,6 @@ from keras.layers.embeddings import Embedding
 
 from classifytweet.resolve import paths
 
-
 def preprocess_tweet(tweet):
     """
     preprocess the text in a single tweet. convert all urls to sting "URL"
@@ -26,6 +25,7 @@ def preprocess_tweet(tweet):
     tweet = re.sub(r'#([^\s]+)', r'\1', tweet)
     tweet = re.sub(r'\W*\b\w{1,3}\b', '', tweet)
     return tweet
+
 
 
 def entry_point():
@@ -71,13 +71,15 @@ def entry_point():
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
 
-    history = model.fit(X, y, batch_size=128, verbose=1, validation_split=0.2, epochs=2)
+    history = model.fit(X, y, batch_size=512, verbose=1, validation_split=0.2, epochs=2)
     model.save(paths.model(filename='model.h5'))
 
-    print("loss")
+    print("training loss")
     print(history.history['loss'])
-    print("accuracy")
+    print("training accuracy")
     print(history.history['acc'])
+    print("validation accuracy")
+    print(history.history['val_acc'])
 
 
 if __name__ == '__main__':

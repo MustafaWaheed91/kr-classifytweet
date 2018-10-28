@@ -16,7 +16,10 @@ setup(
         'nltk',
         'Keras',
         'tensorflow',
-        'matplotlib'
+        'matplotlib',
+        'flask',
+        'gevent',
+        'gunicorn'
     ],
 
     entry_points={

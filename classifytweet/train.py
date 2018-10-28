@@ -10,6 +10,19 @@ from keras.layers.embeddings import Embedding
 
 from classifytweet.resolve import paths
 
+
+def read_config_file(config_json):
+    """
+    This function reads in a json file like hyperparameters.json or resourceconfig.json
+    :param config_json: this is a string path to the location of the file (for both sagemaker or local)
+    :return: a python dict is returned
+    """
+    config_path = paths.config(config_json)
+    if os.path.exists(config_path):
+        json_data = open(config_path).read()
+        return(json.loads(json_data))
+
+
 def preprocess_tweet(tweet):
     """
     preprocess the text in a single tweet. convert all urls to sting "URL"
@@ -27,25 +40,25 @@ def preprocess_tweet(tweet):
     return tweet
 
 
-
 def entry_point():
     """
+    This function trains the model prameters and same them
     read data , describe model graph and finally train model
     return: initiates the keras training job and saved model.h5 file at the end
     """
-
     dataframe = pd.read_csv(paths.input(channel='training', filename="training.1600000.processed.noemoticon.csv"), encoding="ISO-8859-1", header=None).iloc[:, [0, 4, 5]].sample(frac=1).reset_index(drop=True)
     tweets = np.array(dataframe.iloc[:, 2].apply(preprocess_tweet).values)
     sentiment = np.array(dataframe.iloc[:, 0].values)
     print(tweets)
 
-    vocab_size = 400000
+    hyperparam_config = read_config_file(config_json="hyperparameter.json")
+    vocab_size = int(hyperparam_config["vocab_size"])
+
     tk = Tokenizer(num_words=vocab_size)
     tk.fit_on_texts(tweets)
     t = tk.texts_to_sequences(tweets)
     X = np.array(sequence.pad_sequences(t, maxlen=20, padding='post'))
     y = sentiment
-
     print(X.shape, y.shape)
 
     y[y == 4] = 1
@@ -66,12 +79,13 @@ def entry_point():
     model.add(MaxPooling1D(pool_size=2))
     model.add(Dropout(0.2))
     model.add(Flatten())
-    model.add(Dense(1,activation='sigmoid'))
+    model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=str(hyperparam_config["loss"]), optimizer=str(hyperparam_config["optimizer"]), metrics=[str(hyperparam_config["metric"])])
     model.summary()
 
-    history = model.fit(X, y, batch_size=512, verbose=1, validation_split=0.2, epochs=2)
+    history = model.fit(X, y, batch_size=int(hyperparam_config["batch_size"]), verbose=1,
+                        validation_split=float(hyperparam_config["validation_split"]), epochs=int(hyperparam_config["epochs"]))
     model.save(paths.model(filename='model.h5'))
 
     print("training loss")

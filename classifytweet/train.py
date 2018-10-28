@@ -21,7 +21,7 @@ def read_config_file(config_json):
     config_path = paths.config(config_json)
     if os.path.exists(config_path):
         json_data = open(config_path).read()
-        return(json.loads(json_data))
+        return json.loads(json_data)
 
 
 def preprocess_tweet(tweet):
@@ -52,9 +52,9 @@ def entry_point():
     sentiment = np.array(dataframe.iloc[:, 0].values)
     print(tweets)
 
-    hyperparam_config = read_config_file(config_json="hyperparameter.json")
-    print(hyperparam_config)
-    vocab_size = int(hyperparam_config["vocab_size"])
+    hyper_params = read_config_file('hyperparameters.json')
+    print(hyper_params )
+    vocab_size = int(hyper_params['vocab_size'])
 
     tk = Tokenizer(num_words=vocab_size)
     tk.fit_on_texts(tweets)
@@ -83,11 +83,19 @@ def entry_point():
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(loss=str(hyperparam_config["loss"]), optimizer=str(hyperparam_config["optimizer"]), metrics=[str(hyperparam_config["metric"])])
+    model.compile(
+        loss=str(hyper_params['loss']),
+        optimizer=str(hyper_params['optimizer']),
+        metrics=[str(hyper_params['metric'])]
+    )
     model.summary()
 
-    history = model.fit(X, y, batch_size=int(hyperparam_config["batch_size"]), verbose=1,
-                        validation_split=float(hyperparam_config["validation_split"]), epochs=int(hyperparam_config["epochs"]))
+    history = model.fit(X, y,
+                        batch_size=int(hyper_params["batch_size"]),
+                        verbose=1,
+                        validation_split=float(hyper_params['validation_split']),
+                        epochs=int(hyper_params['epochs'])
+    )
     model.save(paths.model(filename='model.h5'))
 
     print("training loss")

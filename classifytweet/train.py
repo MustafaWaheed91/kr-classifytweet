@@ -1,11 +1,12 @@
+import os
 import re
-
+import json
 import numpy as np
 import pandas as pd
 from keras.preprocessing import sequence
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, LSTM, Conv1D, MaxPooling1D, Dropout, Activation
+from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropout
 from keras.layers.embeddings import Embedding
 
 from classifytweet.resolve import paths

@@ -53,6 +53,7 @@ def entry_point():
     print(tweets)
 
     hyperparam_config = read_config_file(config_json="hyperparameter.json")
+    print(hyperparam_config)
     vocab_size = int(hyperparam_config["vocab_size"])
 
     tk = Tokenizer(num_words=vocab_size)

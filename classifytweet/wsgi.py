@@ -1,3 +1,3 @@
-import gamesbiz.predictor as myapp
+import classifytweet.predictor as myapp
 
 app = myapp.app

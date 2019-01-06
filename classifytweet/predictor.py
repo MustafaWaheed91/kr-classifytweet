@@ -24,7 +24,7 @@ class ScoringService(object):
         """This class method just checks if the model path is available to us"""
 
         if os.path.exists(paths.model('model.h5')):
-            cls.model = load_model(paths.model('model.h5'))
+            cls.model = True
         else:
             cls.model = None
 
@@ -61,7 +61,7 @@ def transformation():
         print(data)
         print(type(data))
 
-        model = ScoringService.get_model()
+        model = load_model(paths.model('model.h5'))
 
         # loading
         with open(paths.model('tokenizer.pickle'),'rb') as handle:
@@ -73,7 +73,7 @@ def transformation():
         X_test = np.array(sequence.pad_sequences(t, maxlen=20, padding='post'))
 
         prediction = model.predict(X_test)
-        result = {"prediction": prediction}
+        result = {"prediction": prediction[0]}
 
     else:
         return flask.Response(response='This predictor only supports JSON data', status=415, mimetype='text/plain')

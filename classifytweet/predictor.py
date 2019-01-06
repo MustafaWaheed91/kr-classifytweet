@@ -73,7 +73,7 @@ def transformation():
         X_test = np.array(sequence.pad_sequences(t, maxlen=20, padding='post'))
 
         prediction = model.predict(X_test)
-        result = {"prediction": prediction[0]}
+        result = {"prediction": str(prediction[0][0])}
 
     else:
         return flask.Response(response='This predictor only supports JSON data', status=415, mimetype='text/plain')

@@ -19,12 +19,16 @@ setup(
         'matplotlib',
         'flask',
         'gevent',
-        'gunicorn'
+        'gunicorn',
+        'boto3'
     ],
 
     entry_points={
        "classifytweet.training": [
            "train=classifytweet.train:entry_point",
+       ],
+        "classifytweet.hosting": [
+           "serve=classifytweet.server:start_server",
        ]
     }
 )

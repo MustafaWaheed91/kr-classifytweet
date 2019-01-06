@@ -8,6 +8,8 @@ from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropout
 from keras.layers.embeddings import Embedding
+import pickle
+
 
 from classifytweet.resolve import paths
 
@@ -50,23 +52,23 @@ def entry_point():
     dataframe = pd.read_csv(paths.input(channel='training', filename="training.1600000.processed.noemoticon.csv"), encoding="ISO-8859-1", header=None).iloc[:, [0, 4, 5]].sample(frac=1).reset_index(drop=True)
     tweets = np.array(dataframe.iloc[:, 2].apply(preprocess_tweet).values)
     sentiment = np.array(dataframe.iloc[:, 0].values)
-    print(tweets)
 
     hyper_params = read_config_file('hyperparameters.json')
-    print(hyper_params )
     vocab_size = int(hyper_params['vocab_size'])
 
     tk = Tokenizer(num_words=vocab_size)
     tk.fit_on_texts(tweets)
+
+    with open(paths.model('tokenizer.pickle'), 'wb') as handle:
+        pickle.dump(tk, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     t = tk.texts_to_sequences(tweets)
     X = np.array(sequence.pad_sequences(t, maxlen=20, padding='post'))
     y = sentiment
     print(X.shape, y.shape)
-
     y[y == 4] = 1
 
     model = Sequential()
-
     model.add(Embedding(vocab_size, 32, input_length=20))
     model.add(Conv1D(filters=128, kernel_size=5, padding='same', activation='relu'))
     model.add(MaxPooling1D(pool_size=2))
@@ -90,20 +92,20 @@ def entry_point():
     )
     model.summary()
 
-    history = model.fit(X, y,
-                        batch_size=int(hyper_params["batch_size"]),
-                        verbose=1,
-                        validation_split=float(hyper_params['validation_split']),
-                        epochs=int(hyper_params['epochs'])
+    history = model.fit(
+        X, y,
+        batch_size=int(hyper_params["batch_size"]),
+        verbose=1,
+        validation_split=float(hyper_params['validation_split']),
+        epochs=int(hyper_params['epochs'])
     )
+
     model.save(paths.model(filename='model.h5'))
 
-    print("training loss")
-    print(history.history['loss'])
-    print("training accuracy")
-    print(history.history['acc'])
-    print("validation accuracy")
-    print(history.history['val_acc'])
+    print("loss:" + str(history.history['loss']))
+    print("acc:" + str(history.history['acc']))
+    print("val_loss" + str(history.history['val_loss']))
+    print("val_acc" + str(history.history['val_acc']))
 
 
 if __name__ == '__main__':

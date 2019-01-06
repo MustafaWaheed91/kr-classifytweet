@@ -9,8 +9,6 @@ import pickle
 import numpy as np
 from keras.models import load_model
 from keras.preprocessing import sequence
-from keras.preprocessing.text import Tokenizer
-
 
 from classifytweet.resolve import paths
 from classifytweet.train import preprocess_tweet
@@ -52,22 +50,14 @@ def transformation():
 
     if flask.request.content_type == 'application/json':
         data = flask.request.data.decode('utf-8')
-
-        print(data)
-        print(type(data))
-
         data = json.loads(data)
-
-        print(data)
-        print(type(data))
 
         model = load_model(paths.model('model.h5'))
 
-        # loading
-        with open(paths.model('tokenizer.pickle'),'rb') as handle:
+        with open(paths.model('tokenizer.pickle'), 'rb') as handle:
             tk = pickle.load(handle)
 
-        one_tweet = preprocess_tweet(str(data['data']))
+        one_tweet = preprocess_tweet(data['data'])
         one_tweet = np.array([one_tweet])
         t = tk.texts_to_sequences(one_tweet)
         X_test = np.array(sequence.pad_sequences(t, maxlen=20, padding='post'))
@@ -77,5 +67,6 @@ def transformation():
 
     else:
         return flask.Response(response='This predictor only supports JSON data', status=415, mimetype='text/plain')
-
+    print(data)
+    print(type(data))
     return flask.Response(response=json.dumps(result), status=200, mimetype='application/json')

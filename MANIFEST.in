@@ -1,2 +1,3 @@
 recursive-include classifytweet/data/ *.csv
 recursive-include classifytweet/data/ *.json
+recursive-include classifytweet/ *.conf

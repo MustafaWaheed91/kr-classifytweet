@@ -51,7 +51,7 @@ def start_server():
                                  '-k', 'gevent',
                                  '-b', 'unix:/tmp/gunicorn.sock',
                                  '-w', str(model_server_workers),
-                                 'gamesbiz.wsgi:app'])
+                                 'classifytweet.wsgi:app'])
 
     signal.signal(signal.SIGTERM, lambda a, b: sigterm_handler(nginx.pid, gunicorn.pid))
 

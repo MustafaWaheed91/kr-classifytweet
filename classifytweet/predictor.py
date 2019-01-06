@@ -30,10 +30,6 @@ class ScoringService(object):
 
         return cls.model
 
-    @classmethod
-    def predict(model, preprocessed_tweet):
-        return
-
 
 app = flask.Flask(__name__)
 
